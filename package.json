@@ -1,0 +1,21 @@
+{
+  "name": "codemodTest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "codemodPlusToExp.js",
+  "dependencies": {
+    "babel-cli": "^6.26.0"
+  },
+  "devDependencies": {
+    "babel-plugin-transform-react-createelement-to-jsx": "^1.0.1",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "i": "^0.3.6",
+    "react": "^16.2.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
