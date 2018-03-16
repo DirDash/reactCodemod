@@ -1,4 +1,5 @@
 import React from 'react';
+import {Panel} from 'confirmit-react-components';
 
 function customPanel(props) {
   return (

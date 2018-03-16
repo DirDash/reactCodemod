@@ -1,4 +1,4 @@
-babel --plugins transform-react-jsx panelReact.js > temp.js
-jscodeshift -t codemod01.js temp.js
-babel --plugins transform-react-createelement-to-jsx temp.js > result.js
-
+babel --plugins transform-react-jsx <source> > temp.js
+jscodeshift -t <codemod> temp.js
+babel --plugins transform-react-createelement-to-jsx temp.js > <result>
+prettier --write <result>
