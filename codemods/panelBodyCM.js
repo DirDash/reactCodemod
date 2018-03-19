@@ -4,27 +4,25 @@ export default function transformer(file, api) {
   return j(file.source)
     .find(j.CallExpression)
     .forEach(path => {
-      if (path.node.callee.property.name === 'createElement') {
-        j(path).replaceWith(
-          refactorCreateElement(api, path.node)
-        );
-      }
+      j(path).replaceWith(
+        replaceCallExpression(api, path.node)
+      );
     })
     .toSource();
 }
 
-function refactorCreateElement(api, createElement) {
-  if (isPanel(createElement.arguments[0])) {
-    return refactorCreatePanel(api, createElement);
+function replaceCallExpression(api, callExpression) {
+  if (callExpression.callee.property.name === 'createElement' && isPanel(callExpression.arguments[0])) {
+    return replaceCreatePanel(api, callExpression);
   }
-  return createElement;
+  return callExpression;
 }
 
 function isPanel (argument) {
   return argument.type === 'Identifier' && argument.name === 'Panel';
 }
 
-function refactorCreatePanel(api, createPanel) {
+function replaceCreatePanel(api, createPanel) {
   const j = api.jscodeshift;
 
   let isCollapsible = false;

@@ -1,17 +1,26 @@
 import React from "react";
-import { Panel, PanelHeader, PanelBody } from "confirmit-react-components";
+import {
+  Panel,
+  PanelBody,
+  PanelHeader,
+  PanelToggle,
+  PanelTitle,
+  PanelCollapsible
+} from "confirmit-react-components";
 
 function customPanel(props) {
   return (
-    <Panel width="1000px" collapsible={true} color="primary">
+    <Panel width="1000px" color="primary">
       <PanelHeader>
         <div>Header Content</div>
-        <Panel.Toggle />
-        <Panel.Toggle>
-          <Panel.Title>{props.title}</Panel.Title>
-        </Panel.Toggle>
+        <PanelToggle />
+        <PanelToggle>
+          <PanelTitle>{props.title}</PanelTitle>
+        </PanelToggle>
       </PanelHeader>
-      <PanelBody>{"Body content" + props.content}</PanelBody>
+      <PanelCollapsible>
+        <PanelBody>{"Body content" + props.content}</PanelBody>
+      </PanelCollapsible>
     </Panel>
   );
 }

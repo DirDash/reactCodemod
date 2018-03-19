@@ -1,19 +1,36 @@
-// Working for PanelBody and Panelheader
-// TODO: PanelToggle
-
-let importsToAdd = [];
+let importsToChange = [{
+  toChange: 'Panel.Body',
+  result: 'PanelBody',
+  wasChanged: false
+}, {
+  toChange: 'Panel.Header',
+  result: 'PanelHeader',
+  wasChanged: false
+}, {
+  toChange: 'Panel.Toggle',
+  result: 'PanelToggle',
+  wasChanged: false
+}
+, {
+  toChange: 'Panel.Title',
+  result: 'PanelTitle',
+  wasChanged: false
+}
+, {
+  toChange: 'Panel.Collapsible',
+  result: 'PanelCollapsible',
+  wasChanged: false
+}];
 
 export default function transformer(file, api) {
   const j = api.jscodeshift;
 
   let result = j(file.source)
-    .find(j.CallExpression)
+    .find(j.MemberExpression)
     .forEach(path => {
-      if (path.node.callee.property.name === 'createElement') {
-        j(path).replaceWith(
-          refactorCreateElement(api, path.node)
-        );
-      }
+      j(path).replaceWith(
+        replaceMemberExpression(api, path.node)
+      );
     })
     .toSource();
 
@@ -22,7 +39,7 @@ export default function transformer(file, api) {
     .forEach(path => {
       if (path.node.source.value === 'confirmit-react-components') {
         j(path).replaceWith(
-          refactorImport(api, path.node)
+          addImports(api, path.node)
         );
       }
     })
@@ -31,57 +48,29 @@ export default function transformer(file, api) {
   return result;
 }
 
-function refactorCreateElement(api, createElement) {
-  if (isPanelHeader(createElement.arguments[0])) {
-    return refactorCreateHeader(api, createElement);
-  }
-  if (isPanelBody(createElement.arguments[0])) {
-    return refactorCreateBody(api, createElement);
-  }
-  return createElement;
-}
-
-function isPanelHeader(argument) {
-  return argument.type === 'MemberExpression' && argument.object.name === 'Panel' && argument.property.name === 'Header';
-}
-
-function isPanelBody(argument) {
-  return argument.type === 'MemberExpression' && argument.object.name === 'Panel' && argument.property.name === 'Body';
-}
-
-function refactorCreateHeader(api, createHeader) {
+function replaceMemberExpression(api, element) {
   const j = api.jscodeshift;
 
-  let newArgs = [];
-  newArgs.push(j.identifier('PanelHeader'));
-  for (let i = 1; i < createHeader.arguments.length; i++) {
-    newArgs.push(createHeader.arguments[i]);
+  for (let i = 0; i < importsToChange.length; i++) {
+    if (isElementToChange(element, importsToChange[i].toChange)) {
+      importsToChange[i].wasChanged = true;
+      return j.identifier(importsToChange[i].result);
+    }
   }
-
-  importsToAdd.push('PanelHeader');
-
-  return j.callExpression(createHeader.callee, newArgs);
+  return element;
 }
 
-function refactorCreateBody(api, createBody) {
-  const j = api.jscodeshift;
-
-  let newArgs = [];
-  newArgs.push(j.identifier('PanelBody'));
-  for (let i = 1; i < createBody.arguments.length; i++) {
-    newArgs.push(createBody.arguments[i]);
-  }
-
-  importsToAdd.push('PanelBody');
-
-  return j.callExpression(createBody.callee, newArgs);
+function isElementToChange(element, elementToChange) {
+  return element.type === 'MemberExpression' && (element.object.name + '.' + element.property.name === elementToChange);
 }
 
-function refactorImport(api, importDeclaration) {
+function addImports(api, importDeclaration) {
   const j = api.jscodeshift;
 
-  importsToAdd.forEach((importElement) => {
-    importDeclaration.specifiers.push(j.importSpecifier(j.identifier(importElement), j.identifier(importElement)));
+  importsToChange.forEach((importElement) => {
+    if (importElement.wasChanged) {
+      importDeclaration.specifiers.push(j.importSpecifier(j.identifier(importElement.result), j.identifier(importElement.result)));
+    }
   });
 
   return importDeclaration;

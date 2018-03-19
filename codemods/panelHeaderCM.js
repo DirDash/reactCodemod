@@ -4,27 +4,25 @@ export default function transformer(file, api) {
   return j(file.source)
     .find(j.CallExpression)
     .forEach(path => {
-      if (path.node.callee.property.name === 'createElement') {
-        j(path).replaceWith(
-          refactorCreateElement(api, path.node)
-        );
-      }
+      j(path).replaceWith(
+        replaceCallExpression(api, path.node)
+      );
     })
     .toSource();
 }
 
-function refactorCreateElement(api, createElement) {
-  if (isPanelHeader(createElement.arguments[0])) {
-    return refactorCreateHeader(api, createElement);
+function replaceCallExpression(api, callExpression) {
+  if (callExpression.callee.property.name === 'createElement' && isPanelHeader(callExpression.arguments[0])) {
+    return replaceCreateHeader(api, callExpression);
   }
-  return createElement;
+  return callExpression;
 }
 
 function isPanelHeader(argument) {
   return argument.type === 'MemberExpression' && argument.object.name === 'Panel' && argument.property.name === 'Header';
 }
 
-function refactorCreateHeader(api, createHeader) {
+function replaceCreateHeader(api, createHeader) {
   const j = api.jscodeshift;
 
   let titleArg = j.objectExpression([]);
