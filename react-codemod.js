@@ -1,55 +1,67 @@
+const babel = require('babel-core');
 const cmd = require('node-cmd');
 const fs = require('fs');
+const glob = require('glob');
 
-let source = process.argv[2];
-let codemod = process.argv[3];
-let result = process.argv[4];
+const argv = require('minimist')(process.argv.slice(2));
 
-console.log('Starting react-codemod...');
+console.log('Start react-codemod...');
 
-fs.writeFile('temp.js', '', function(err){
-  if (err) {
-    console.log(err);
-  } else {
-
-    console.log('Transforming from React JSX to JS...');
-    cmd.get('babel --plugins transform-react-jsx ' + source + ' > temp.js', function(err, jsData) {
+glob(argv._[0], {}, function (err, files) {
+  files.forEach((file) => {
+    console.log('Transforming ' + file + ' from React JSX to JS...');
+    babel.transformFile(file, {babelrc: false, plugins: ['transform-react-jsx']}, (err, result) => {
       if (err) {
         console.log(err);
       } else {
-
-        console.log('Codeshifting...');
-        cmd.get('jscodeshift -t ' + codemod + ' temp.js', function(err, refactoredJsData) {
+        fs.writeFile(file, result.code, function(err) {
           if (err) {
             console.log(err);
           } else {
-
-            console.log('Transforming from JS to React JSX...');
-            cmd.get('babel --plugins transform-react-createelement-to-jsx temp.js > ' + (result ? result : source), function(err, refactoredJSXData) {
-              if (err) {
-                console.log(err);
-              } else {
-
-                console.log('Prettifying...');
-                cmd.get('prettier --write ' + (result ? result : source), function(err, prettifiedRefactoredJSXData) {
-                  if (err) {
-                    console.log(err);
-                  } else {
-
-                    fs.unlink('temp.js', function(err){
-                      if (err) {
-                        console.log(err);
-                      } else {
-                        console.log('Successfully done!');
-                      }
-                    });
-                  }
-                });
-              }
+            glob(argv.t, {}, function (err, codemods) {
+              codeshift(file, codemods, 0);
             });
           }
         });
       }
     });
-  }
+  });
 });
+
+function codeshift(file,codemods, index) {
+  if (codemods[index]) {
+    console.log('Codeshifting ' + file + ' by ' + codemods[index] + '...');
+    cmd.get('jscodeshift -t ' + codemods[index] + ' ' + file, function (err) {
+      if (err) {
+        console.log(err);
+      }
+      codeshift(file, codemods, index + 1);
+    });
+  } else {
+    transformToReactJSX(file);
+  }
+}
+
+function transformToReactJSX(file, temp) {
+  console.log('Transforming' + file + ' from JS to React JSX...');
+  babel.transformFile(file, {babelrc: false, plugins: ['transform-react-createelement-to-jsx']}, (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      fs.writeFile(file, result.code, function(err) {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log('Prettifying' + file + '...');
+          cmd.get('prettier --write ' + file, function (err) {
+            if (err) {
+              console.log(err);
+            } else {
+              console.log(file + ' Successfully done!');
+            }
+          });
+        }
+      });
+    }
+  });
+}

@@ -12,7 +12,7 @@ function customPanel(props) {
   return (
     <Panel width="1000px" color="primary">
       <PanelHeader>
-        <div>Header Content</div>
+        <div>Header Content 2</div>
         <PanelToggle />
         <PanelToggle>
           <PanelTitle>{props.title}</PanelTitle>
