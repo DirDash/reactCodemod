@@ -82,10 +82,9 @@ storiesOf('confirmit-react-components/Panel', module)
     return (
       <Panel>
         <Panel.Header>
-          
-            <Panel.Toggle>
-          <Panel.Title>Title</Panel.Title>
-        </Panel.Toggle>
+          <Panel.Toggle>
+        <Panel.Title>Title</Panel.Title>
+      </Panel.Toggle>
           <Panel.Actions><Panel.Toggle /></Panel.Actions></Panel.Header>
         <Panel.Collapsible>
           <Panel.Body>Can collapse, expanded by default</Panel.Body>
