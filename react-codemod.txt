@@ -1,4 +1,0 @@
-babel --plugins transform-react-jsx <source> > temp.js
-jscodeshift -t <codemod> temp.js
-babel --plugins transform-react-createelement-to-jsx temp.js > <result>
-prettier --write <result>

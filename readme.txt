@@ -1,5 +1,8 @@
 USAGE:
-node react-codemod.js <file/files to transform (glob pattern)> -t <codemod/codemods (glob pattern)>
+    node <transform file> <file/files to transform (glob pattern)>
+
+    -write, -w    write output to the file
+    -quiet, -q    don't write output to console
 
 EXAMPLE:
-node react-codemod.js examples/panel*.js -t codemods/panel*CM.js
+    node transform-panel.js examples/panel*.js -w

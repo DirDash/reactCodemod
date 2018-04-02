@@ -4,18 +4,11 @@
   "description": "",
   "main": "",
   "dependencies": {
-    "babel-cli": "^6.26.0"
-  },
-  "devDependencies": {
-    "babel-plugin-transform-react-createelement-to-jsx": "^1.0.1",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
     "glob": "^7.1.2",
-    "minimist": "^1.2.0",
-    "node-cmd": "^3.0.0",
-    "react": "^16.2.0"
+    "jscodeshift": "^0.5.0",
+    "minimist": "^1.2.0"
   },
-  "scripts": {
-  },
+  "scripts": {},
   "keywords": [],
   "author": "",
   "license": "ISC"
